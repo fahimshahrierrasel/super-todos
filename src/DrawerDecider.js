@@ -1,6 +1,6 @@
 import React from "react";
 import Drawer from "@material-ui/core/Drawer";
-import MyDrawer from "./Drawer";
+import MyDrawer from "./MyDrawer";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 const drawerWidth = 240;
@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
 function DrawerDecider(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const { width } = props;
+  const { width, todos } = props;
   if (width === "xs") {
     return (
       <Drawer
@@ -29,7 +29,7 @@ function DrawerDecider(props) {
           keepMounted: true // Better open performance on mobile.
         }}
       >
-        <MyDrawer />
+        <MyDrawer todos={todos} />
       </Drawer>
     );
   } else {
@@ -41,7 +41,7 @@ function DrawerDecider(props) {
         variant="permanent"
         open
       >
-        <MyDrawer />
+        <MyDrawer todos={todos} />
       </Drawer>
     );
   }

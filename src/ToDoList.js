@@ -21,25 +21,13 @@ const useStyles = makeStyles(theme => ({
 
 function ToDoList(props) {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState([]);
-
-  const handleToggle = value => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-    setChecked(newChecked);
-  };
+  const { todos, deleteToDo, handleToggle } = props;
 
   return (
     <div>
       <h3>Today</h3>
       <List className={classes.root}>
-        {props.todos.map((value, index) => {
+        {todos.map((item, index) => {
           const labelId = `checkbox-list-label-${index}`;
           return (
             <ListItem
@@ -47,20 +35,24 @@ function ToDoList(props) {
               role={undefined}
               dense
               button
-              onClick={handleToggle(index)}
+              onClick={() => handleToggle(item.id)}
             >
               <ListItemIcon>
                 <Checkbox
                   edge="start"
-                  checked={checked.indexOf(index) !== -1}
+                  checked={item.status}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ "aria-labelledby": labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={value.message} />
+              <ListItemText id={labelId} primary={item.todo} />
               <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="comments">
+                <IconButton
+                  edge="end"
+                  aria-label="comments"
+                  onClick={() => deleteToDo(item.id)}
+                >
                   <DeleteIcon />
                 </IconButton>
               </ListItemSecondaryAction>

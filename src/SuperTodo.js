@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import uuidv4 from "@bundled-es-modules/uuid/v4.js";
+import moment from "moment";
+import { makeStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   CssBaseline,
@@ -8,10 +11,11 @@ import {
   Typography
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import { makeStyles } from "@material-ui/core/styles";
+
 import NewTodo from "./NewToDo";
 import ToDoList from "./ToDoList";
 import DrawerDecider from "./DrawerDecider";
+import db from "./db";
 
 const drawerWidth = 240;
 
@@ -54,12 +58,48 @@ function SuperTodo(props) {
   }
 
   function addNewTodo(todo) {
-    setTodos([...todos, { message: todo }]);
+    const newToDo = {
+      id: uuidv4(),
+      todo: todo,
+      status: false,
+      created_at: moment()
+        .subtract(1, "days")
+        .format("l")
+    };
+    db.table("todos")
+      .add(newToDo)
+      .then(() => {
+        setTodos([...todos, newToDo]);
+      });
+  }
+
+  function handleToggle(id) {
+    const selectedToDo = todos[todos.findIndex(x => x.id === id)];
+    const status = !selectedToDo.status;
+
+    db.table("todos")
+      .update(id, { status })
+      .then(() => {
+        setTodos(() =>
+          todos.map(todo =>
+            todo.id === id ? { ...todo, status: status } : todo
+          )
+        );
+      });
+  }
+
+  function deleteTodo(id) {
+    // TODO Removed from indexedDB
+    setTodos(todos.filter(todo => todo.id !== id));
   }
 
   useEffect(() => {
-    console.log(new Date());
-  }, [todos, setTodos]);
+    db.table("todos")
+      .toArray()
+      .then(todos => {
+        setTodos(todos);
+      });
+  }, [todos]);
 
   return (
     <div className={classes.root}>
@@ -85,12 +125,17 @@ function SuperTodo(props) {
           width={props.width}
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
+          todos={todos}
         />
       </nav>
       <main className={classes.content}>
         <div className={[classes.toolbar, classes.mainContent].join(" ")}>
           <NewTodo addNewTodo={addNewTodo} />
-          <ToDoList todos={todos} />
+          <ToDoList
+            todos={todos}
+            handleToggle={handleToggle}
+            deleteToDo={deleteTodo}
+          />
         </div>
       </main>
     </div>
