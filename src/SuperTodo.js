@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import IconButton from "@material-ui/core/IconButton";
+import {
+  AppBar,
+  CssBaseline,
+  IconButton,
+  Toolbar,
+  withWidth,
+  Typography
+} from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import MyDrawer from "./Drawer";
+import { makeStyles } from "@material-ui/core/styles";
 import NewTodo from "./NewToDo";
 import ToDoList from "./ToDoList";
+import DrawerDecider from "./DrawerDecider";
 
 const drawerWidth = 240;
 
@@ -34,9 +35,6 @@ const useStyles = makeStyles(theme => ({
     }
   },
   toolbar: theme.mixins.toolbar,
-  drawerPaper: {
-    width: drawerWidth
-  },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3)
@@ -46,9 +44,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function SuperTodo() {
+function SuperTodo(props) {
   const classes = useStyles();
-  const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [todos, setTodos] = useState([]);
 
@@ -84,34 +81,11 @@ function SuperTodo() {
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Hidden smUp implementation="css">
-          <Drawer
-            variant="temporary"
-            anchor={theme.direction === "rtl" ? "right" : "left"}
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            ModalProps={{
-              keepMounted: true // Better open performance on mobile.
-            }}
-          >
-            <MyDrawer />
-          </Drawer>
-        </Hidden>
-        <Hidden xsDown implementation="css">
-          <Drawer
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            variant="permanent"
-            open
-          >
-            <MyDrawer />
-          </Drawer>
-        </Hidden>
+        <DrawerDecider
+          width={props.width}
+          mobileOpen={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+        />
       </nav>
       <main className={classes.content}>
         <div className={[classes.toolbar, classes.mainContent].join(" ")}>
@@ -123,4 +97,4 @@ function SuperTodo() {
   );
 }
 
-export default SuperTodo;
+export default withWidth()(SuperTodo);
