@@ -62,9 +62,7 @@ function SuperTodo(props) {
       id: uuidv4(),
       todo: todo,
       status: false,
-      created_at: moment()
-        .subtract(1, "days")
-        .format("l")
+      created_at: moment().format("DD-MM-YYYY")
     };
     db.table("todos")
       .add(newToDo)
@@ -89,8 +87,11 @@ function SuperTodo(props) {
   }
 
   function deleteTodo(id) {
-    // TODO Removed from indexedDB
-    setTodos(todos.filter(todo => todo.id !== id));
+    db.table("todos")
+      .delete(id)
+      .then(() => {
+        setTodos(todos.filter(todo => todo.id !== id));
+      });
   }
 
   useEffect(() => {
