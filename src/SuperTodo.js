@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import uuidv4 from "@bundled-es-modules/uuid/v4.js";
+import uuid from "uuid/v4";
 import moment from "moment";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -59,7 +59,7 @@ function SuperTodo(props) {
 
   function addNewTodo(todo) {
     const newToDo = {
-      id: uuidv4(),
+      id: uuid(),
       todo: todo,
       status: false,
       created_at: moment().format("DD-MM-YYYY")
