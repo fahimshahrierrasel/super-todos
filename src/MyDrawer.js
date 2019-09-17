@@ -1,4 +1,5 @@
 import React from "react";
+import moment from 'moment';
 
 import {
   List,
@@ -14,25 +15,45 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function reducerMethod(acc, item) {
-  if (acc[item.created_at]) acc[item.created_at] += 1;
-  else acc[item.created_at] = 1;
+  const itemDate = moment(item.created_at).format("DD-MM-YYYY")
+  if (acc[itemDate]) acc[itemDate] += 1;
+  else acc[itemDate] = 1;
   return acc;
 }
 
-function MyDrawer({ todos }) {
+function changeDate(date) {
+  let day = "Today";
+  const today = moment();
+  switch (date) {
+    case today.format("DD-MM-YYYY"):
+      day = "Today";
+      break;
+    case today.subtract(1, 'days').format("DD-MM-YYYY"):
+      day = "Yesterday";
+      break;
+    default:
+      day = date;
+  }
+  return day;
+}
+
+function MyDrawer({ todos, changeSelectedDate }) {
   const classes = useStyles();
 
-  const dates = todos.reduce(reducerMethod, {});
+  const dateObject = todos.reduce(reducerMethod, {});
+  const dates = Object.keys(dateObject).sort((a, b) => {
+    return moment(a, "DD-MM-YYYY") - moment(b, "DD-MM-YYYY");
+  }).reverse();
 
   return (
     <div>
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        {Object.keys(dates).map((key, index) => (
-          <ListItem button key={key}>
-            <Badge color="primary" badgeContent={dates[key]}>
-              <ListItemText primary={key} />
+        {dates.map(date => (
+          <ListItem button key={date} onClick={() => changeSelectedDate(date)}>
+            <Badge color="primary" badgeContent={dateObject[date]}>
+              <ListItemText primary={changeDate(date)} />
             </Badge>
           </ListItem>
         ))}

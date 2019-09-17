@@ -52,6 +52,8 @@ function SuperTodo(props) {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [todos, setTodos] = useState([]);
+  const [selectedTodos, setSelectedTodos] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(moment().format("DD-MM-YYYY"))
 
   function handleDrawerToggle() {
     setMobileOpen(!mobileOpen);
@@ -62,7 +64,7 @@ function SuperTodo(props) {
       id: uuid(),
       todo: todo,
       status: false,
-      created_at: moment().format("DD-MM-YYYY")
+      created_at: moment().format()
     };
     db.table("todos")
       .add(newToDo)
@@ -98,9 +100,29 @@ function SuperTodo(props) {
     db.table("todos")
       .toArray()
       .then(todos => {
-        setTodos(todos);
+        setTodos(todos)
       });
-  }, [todos]);
+  }, [])
+
+  useEffect(() => {
+    db.table("todos")
+      .toArray()
+      .then(todos => {
+        return todos.filter(todo => moment(todo.created_at).format("DD-MM-YYYY") === selectedDate)
+      })
+      .then(todos => {
+        return todos.sort((a, b) => {
+          return moment(a.created_at) - moment(b.created_at);
+        }).reverse();
+      })
+      .then(todos => {
+        setSelectedTodos(todos);
+      });
+  }, [todos, selectedDate]);
+
+  function changeSelectedDate(date) {
+    setSelectedDate(date);
+  }
 
   return (
     <div className={classes.root}>
@@ -127,13 +149,14 @@ function SuperTodo(props) {
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
           todos={todos}
+          changeSelectedDate={changeSelectedDate}
         />
       </nav>
       <main className={classes.content}>
         <div className={[classes.toolbar, classes.mainContent].join(" ")}>
           <NewTodo addNewTodo={addNewTodo} />
           <ToDoList
-            todos={todos}
+            todos={selectedTodos}
             handleToggle={handleToggle}
             deleteToDo={deleteTodo}
           />

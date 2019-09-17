@@ -29,7 +29,7 @@ function DrawerDecider(props) {
           keepMounted: true // Better open performance on mobile.
         }}
       >
-        <MyDrawer todos={todos} />
+        <MyDrawer todos={todos} changeSelectedDate={props.changeSelectedDate} />
       </Drawer>
     );
   } else {
@@ -41,7 +41,7 @@ function DrawerDecider(props) {
         variant="permanent"
         open
       >
-        <MyDrawer todos={todos} />
+        <MyDrawer todos={todos} changeSelectedDate={props.changeSelectedDate} />
       </Drawer>
     );
   }
